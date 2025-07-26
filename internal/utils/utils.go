@@ -27,6 +27,7 @@ func WriteJson(w http.ResponseWriter, status int, data Envelope) error {
 	return nil
 }
 
+// read id param from route
 func ReadIDParam(r *http.Request) (int64, error) {
 	idParam := chi.URLParam(r, "id")
 
