@@ -2,15 +2,49 @@ package store
 
 import (
 	"database/sql"
+	"errors"
 	"time"
 
+	"golang.org/x/crypto/bcrypt"
 	_ "golang.org/x/crypto/bcrypt"
 )
 
 type password struct {
 	plainText *string
-	hash      []byte
+	//uint8 0 <= val < 256
+	hash []byte
 }
+
+func (p *password) Set(plainTextPassword string) error {
+
+	hash, err := bcrypt.GenerateFromPassword([]byte(plainTextPassword), 12)
+
+	if err != nil {
+		return err
+	}
+
+	p.plainText = &plainTextPassword
+	p.hash = hash
+	return nil
+}
+
+func (p *password) Matches(plainTextPassword string) (bool, error) {
+
+	err := bcrypt.CompareHashAndPassword(p.hash, []byte(plainTextPassword))
+	if err != nil {
+		switch {
+		//if password missmatches, the becript methods returns an error type
+		case errors.Is(err, bcrypt.ErrMismatchedHashAndPassword):
+			return false, nil
+		default:
+			//if any other error occurs, Matches() method fails and we return error as internal server error
+			return false, err
+		}
+	}
+
+	return true, nil
+}
+
 type User struct {
 	ID           int       `json:"id"`
 	Username     string    `json:"username"`
