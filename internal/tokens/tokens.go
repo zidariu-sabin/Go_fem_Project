@@ -26,7 +26,7 @@ func GenerateToken(userID int, ttl time.Duration, scope string) (*Token, error) 
 		Expiry: time.Now().Add(ttl),
 		Scope:  scope,
 	}
-
+	//creates an empty array of bytes
 	emptyBytes := make([]byte, 32)
 
 	//filles empty slice of bytes read with random characters
@@ -36,11 +36,11 @@ func GenerateToken(userID int, ttl time.Duration, scope string) (*Token, error) 
 		return nil, err
 	}
 
+	//we pass the created token as a slice and encrypt it
 	//if a value is sent that does not fully meet what the encoder is, the rest is padded with "=" signs
 	token.PlainText = base32.StdEncoding.WithPadding(base32.NoPadding).EncodeToString(emptyBytes)
 
 	//using the standard documented crypting lbrary of go to avoid creating a hashing algoritm ourselves
-	//we pass the created token as a slice and encrypt it
 	hash := sha256.Sum256([]byte(token.PlainText))
 
 	token.Hash = hash[:]
