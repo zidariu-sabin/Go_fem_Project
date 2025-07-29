@@ -101,7 +101,29 @@ func (uh *UserHandler) HandleRegisterUser(w http.ResponseWriter, r *http.Request
 }
 
 func (uh *UserHandler) HandleGetUserByUsername(w http.ResponseWriter, r *http.Request) {
+	var req registerUserRequest
 
+	err := json.NewDecoder(r.Body).Decode(&req)
+
+	if err != nil {
+		uh.logger.Printf("ERROR: decodingGetUserByUsernameRequest: %v", err)
+		utils.WriteJson(w, http.StatusBadRequest, utils.Envelope{"error": "invalid request"})
+		return
+	}
+
+	user, err := uh.userStore.GetUserByUsername(req.Username)
+
+	if err != nil {
+		uh.logger.Printf("ERROR: gettingUserByUsername: %v", err)
+		utils.WriteJson(w, http.StatusInternalServerError, utils.Envelope{"error": "internal server error"})
+		return
+	}
+
+	if user == nil {
+		utils.WriteJson(w, http.StatusNotFound, utils.Envelope{"user": "Not Found"})
+	}
+
+	utils.WriteJson(w, http.StatusOK, utils.Envelope{"user": user})
 }
 
 func (uh *UserHandler) HandleSearch(w http.ResponseWriter, r *http.Request) {
