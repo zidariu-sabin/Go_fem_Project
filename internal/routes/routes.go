@@ -9,12 +9,16 @@ import (
 func SetupRoutes(app *app.Application) *chi.Mux {
 	router := chi.NewRouter()
 
-	router.Get("/health", app.HealthCheck)
+	router.Group(func(r chi.Router) {
+		r.Use(app.Middleware.Authenticate)
 
-	router.Get("/workout/{id}", app.WorkoutHandler.HandleGetWorkoutById)
-	router.Post("/workout-create", app.WorkoutHandler.HandleCreateWorkout)
-	router.Put("/workout-update/{id}", app.WorkoutHandler.HandleUpdateWorkoutById)
-	router.Delete("/workout-delete/{id}", app.WorkoutHandler.HandleDeleteWorkoutById)
+		router.Get("/workout/{id}", app.Middleware.RequireUser(app.WorkoutHandler.HandleGetWorkoutById))
+		router.Post("/workout", app.Middleware.RequireUser(app.WorkoutHandler.HandleCreateWorkout))
+		router.Put("/workout/{id}", app.Middleware.RequireUser(app.WorkoutHandler.HandleUpdateWorkoutById))
+		router.Delete("/workout/{id}", app.Middleware.RequireUser(app.WorkoutHandler.HandleDeleteWorkoutById))
+	})
+
+	router.Get("/health", app.HealthCheck)
 
 	router.Post("/user-create", app.UserHandler.HandleRegisterUser)
 	router.Get("/user", app.UserHandler.HandleGetUserByUsername)
