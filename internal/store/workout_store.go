@@ -8,6 +8,7 @@ import (
 // adding this `json:` tag is a go feature that will allow us to assign a struct a json stucture aswell
 type Workout struct {
 	ID              int            `json:"id"`
+	UserID          int            `json:"user_id"`
 	Title           string         `json:"title"`
 	Description     string         `json:"description"`
 	DurationMinutes int            `json:"duration_minutes"`
@@ -43,6 +44,7 @@ type WorkoutStore interface {
 	GetWorkoutByID(id int64) (*Workout, error)
 	UpdateWorkout(*Workout) error
 	DeleteWorkout(id int64) error
+	GetWorkoutOwner(workoutID int64) (int, error)
 }
 
 func (pg *PostgresWorkoutStore) CreateWorkout(workout *Workout) (*Workout, error) {
@@ -56,12 +58,12 @@ func (pg *PostgresWorkoutStore) CreateWorkout(workout *Workout) (*Workout, error
 	defer tx.Rollback()
 
 	query :=
-		`INSERT INTO  workouts(title, description, duration_minutes, calories_burned)
-	VALUES ($1,$2,$3,$4)
+		`INSERT INTO  workouts(user_id, title, description, duration_minutes, calories_burned)
+	VALUES ($1,$2,$3,$4,$5)
 	RETURNING id
 	`
 
-	err = tx.QueryRow(query, workout.Title, workout.Description, workout.DurationMinutes, workout.CaloriesBurned).Scan(&workout.ID)
+	err = tx.QueryRow(query, workout.UserID, workout.Title, workout.Description, workout.DurationMinutes, workout.CaloriesBurned).Scan(&workout.ID)
 
 	if err != nil {
 		return nil, err
@@ -220,4 +222,20 @@ func (pg *PostgresWorkoutStore) DeleteWorkout(id int64) error {
 	}
 
 	return nil
+}
+
+func (pg *PostgresWorkoutStore) GetWorkoutOwner(workoutID int64) (int, error) {
+	var userID int
+
+	query := `
+	SELECT user_id
+	FROM workouts where id = $1`
+
+	err := pg.db.QueryRow(query, workoutID).Scan(&userID)
+
+	if err != nil {
+		return 0, err
+	}
+
+	return userID, nil
 }
