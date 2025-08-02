@@ -9,8 +9,8 @@ import (
 func SetupRoutes(app *app.Application) *chi.Mux {
 	router := chi.NewRouter()
 
-	router.Group(func(r chi.Router) {
-		r.Use(app.Middleware.Authenticate)
+	router.Group(func(router chi.Router) {
+		router.Use(app.Middleware.Authenticate)
 
 		router.Get("/workout/{id}", app.Middleware.RequireUser(app.WorkoutHandler.HandleGetWorkoutById))
 		router.Post("/workout", app.Middleware.RequireUser(app.WorkoutHandler.HandleCreateWorkout))

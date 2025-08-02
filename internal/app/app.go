@@ -19,7 +19,7 @@ type Application struct {
 	WorkoutHandler *api.WorkoutHandler
 	UserHandler    *api.UserHandler
 	TokenHandler   *api.TokenHandler
-	Middleware     middleware.UserMiddleware
+	Middleware     *middleware.UserMiddleware
 	DB             *sql.DB
 }
 
@@ -48,7 +48,7 @@ func NewApplication() (*Application, error) {
 	workoutHandler := api.NewWorkoutHandler(workoutStore, logger)
 	userHandler := api.NewUserHandler(userStore, logger)
 	tokenHandler := api.NewTokenHandler(tokenStore, userStore, logger)
-	middlewareHandler := middleware.UserMiddleware{UserStore: userStore}
+	middlewareHandler := middleware.NewUserMiddleware(userStore)
 
 	app := &Application{
 		Logger:         logger,

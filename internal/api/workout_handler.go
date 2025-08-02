@@ -77,6 +77,7 @@ func (wh *WorkoutHandler) HandleCreateWorkout(w http.ResponseWriter, r *http.Req
 		return
 	}
 
+	wh.logger.Printf(" createWorkout: %v", createdWorkout)
 	err = utils.WriteJson(w, http.StatusCreated, utils.Envelope{"workout": createdWorkout})
 	if err != nil {
 		wh.logger.Printf("ERROR: formattingJsonData: %v", err)
