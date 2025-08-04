@@ -56,7 +56,6 @@ func (pg *PostgresWorkoutStore) CreateWorkout(workout *Workout) (*Workout, error
 	}
 	//rollback is defered so it only proceeds at the end if there are caught errors within the transaction object
 	defer tx.Rollback()
-
 	query :=
 		`INSERT INTO  workouts(user_id, title, description, duration_minutes, calories_burned)
 	VALUES ($1,$2,$3,$4,$5)

@@ -22,7 +22,7 @@ func setupTestDB(t *testing.T) *sql.DB {
 		t.Fatalf("migration test db error: %v", err)
 	}
 
-	_, err = db.Exec(`TRUNCATE workouts, workout_entries CASCADE`)
+	_, err = db.Exec(`TRUNCATE users, workouts, workout_entries CASCADE`)
 
 	if err != nil {
 		t.Fatalf("truncating tables error: %v", err)
@@ -36,20 +36,26 @@ func TestCreateWorkout(t *testing.T) {
 	db := setupTestDB(t)
 	defer db.Close()
 
+	userStore := NewPostgresUserStore(db)
 	store := NewPostgresWorkoutStore(db)
 	//
 	//TODO: add user ids
 	//
 	tests := []struct {
 		name    string
+		user    *User
 		workout *Workout
 		wantErr bool
 	}{
 		//valid test case
 		{
 			name: "valid workout",
+			user: &User{
+				Username:     "User1",
+				PasswordHash: password{plainText: StringPtr("User1Password")},
+				Email:        "User1@gmail.com",
+			},
 			workout: &Workout{
-				// UserID:          1,
 				Title:           "push day",
 				DurationMinutes: 60,
 				CaloriesBurned:  200,
@@ -68,8 +74,12 @@ func TestCreateWorkout(t *testing.T) {
 		},
 		{
 			name: "workout with invalid entries",
+			user: &User{
+				Username:     "User2",
+				PasswordHash: password{plainText: StringPtr("User2Password")},
+				Email:        "User2@gmail.com",
+			},
 			workout: &Workout{
-				// UserID:          1,
 				Title:           "full body",
 				Description:     "complete workout",
 				DurationMinutes: 90,
@@ -99,6 +109,17 @@ func TestCreateWorkout(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+
+			err := tt.user.PasswordHash.Set(*tt.user.PasswordHash.plainText)
+
+			require.NoError(t, err)
+
+			err = userStore.CreateUser(tt.user)
+
+			require.NoError(t, err)
+
+			tt.workout.UserID = tt.user.ID
+
 			createdWorkout, err := store.CreateWorkout(tt.workout)
 
 			if tt.wantErr {
@@ -132,4 +153,7 @@ func IntPtr(i int) *int {
 }
 func FloatPtr(f float64) *float64 {
 	return &f
+}
+func StringPtr(s string) *string {
+	return &s
 }
