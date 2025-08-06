@@ -16,12 +16,13 @@ func SetupRoutes(app *app.Application) *chi.Mux {
 		router.Post("/workout", app.Middleware.RequireUser(app.WorkoutHandler.HandleCreateWorkout))
 		router.Put("/workout/{id}", app.Middleware.RequireUser(app.WorkoutHandler.HandleUpdateWorkoutById))
 		router.Delete("/workout/{id}", app.Middleware.RequireUser(app.WorkoutHandler.HandleDeleteWorkoutById))
+		router.Get("/user", app.Middleware.RequireUser(app.UserHandler.HandleGetUserByUsername))
+
 	})
 
 	router.Get("/health", app.HealthCheck)
 
 	router.Post("/user", app.UserHandler.HandleRegisterUser)
-	router.Get("/user", app.UserHandler.HandleGetUserByUsername)
 	router.Post("/tokens/authentication", app.TokenHandler.HandleCreateToken)
 
 	return router
