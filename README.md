@@ -1,9 +1,11 @@
 # GoWorkoutTracker
 ### Description
+---
 A Frontend Masters project resembling the backend of a workout tracker application written in go
 
-the entire application will be running using an app object that is parsed and attributed  during the main function
 ### arhitecture
+---
+The entire application will be running using an app object that is parsed and attributed  during the main function
 
 main.go
 - configuration and lifecycle of the application
@@ -28,7 +30,7 @@ fs.go
 - file that will tell the compiler the order in which to run the migrations
 
 ### functionality
-
+---
 logging 
 - is done using the log package
 response formatting 
@@ -47,7 +49,7 @@ authentification
 testing
 - table tests of database manipulation methods using stretchr/testify  package
 ### file structure
-
+---
 - go.mod
 - go.sum
 - main.go
@@ -69,13 +71,15 @@ testing
 - public
 	- a list of example requests can be used to test the functionality of the project
 
-Database
+### Database
+---
 - postgres database
 - we use pgx as the driver to create the postgres database
 - goose for database migrations
 - using embedded migrations
 
-Improvements:
+### Improvements:
+---
 - constants.go file for defining error messages and print statements that are going to be reused
 - abstract token creation to pass the scope in the request body
 - avoiding code duplication in error checking in handler sections
