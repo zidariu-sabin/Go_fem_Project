@@ -3,7 +3,7 @@
 ---
 A Frontend Masters project resembling the backend of a workout tracker application written in go
 
-### arhitecture
+### Arhitecture
 ---
 The entire application will be running using an app object that is parsed and attributed  during the main function
 
@@ -29,7 +29,7 @@ middleware.go
 fs.go
 - file that will tell the compiler the order in which to run the migrations
 
-### functionality
+### Functionality
 ---
 logging 
 - is done using the log package
@@ -48,7 +48,7 @@ authentification
 	- entries are created in the database containing userd id, expiration time, and scope and specific token hash checksum
 testing
 - table tests of database manipulation methods using stretchr/testify  package
-### file structure
+### File structure
 ---
 - go.mod
 - go.sum
